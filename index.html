@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FAQ自動生成</title>
+<style>
+body {
+  font-family: sans-serif;
+  background: #f6f8fb;
+  padding: 40px;
+}
+.container {
+  max-width: 700px;
+  margin: auto;
+}
+h1 {
+  text-align: center;
+}
+input, button {
+  padding: 10px;
+  font-size: 16px;
+}
+button {
+  margin-left: 10px;
+}
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 10px;
+}
+.copy {
+  margin-top: 10px;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>FAQ自動生成</h1>
+
+  <input id="input" placeholder="例：カフェ / 小学校 / 高校 / ホテル">
+  <button onclick="generateFAQ()">生成</button>
+
+  <div id="output"></div>
+</div>
+
+<script>
+// 🔹 カテゴリ定義
+const categories = {
+  cafe: ["カフェ", "喫茶店", "コーヒー"],
+  restaurant: ["レストラン", "飲食店", "居酒屋"],
+  salon: ["美容院", "美容室", "サロン"],
+  gym: ["ジム", "フィットネス"],
+  hospital: ["病院", "クリニック"],
+  hotel: ["ホテル", "旅館", "宿"],
+  shop: ["ショップ", "店舗", "販売"],
+  company: ["会社", "企業"],
+  school_elementary: ["小学校"],
+  school_junior: ["中学校"],
+  school_high: ["高校"],
+  school_university: ["大学"],
+  employment_support: ["就労支援", "就労移行", "A型", "B型", "作業所"],
+  nursery: ["保育園", "保育所"],
+  kindergarten: ["幼稚園"]
+};
+
+// 🔹 FAQデータ
+const faqData = {
+
+  cafe: [
+    "テイクアウトはできますか？",
+    "Wi-Fiは使えますか？",
+    "駐車場はありますか？",
+    "予約は必要ですか？",
+    "支払い方法は何がありますか？"
+  ],
+
+  restaurant: [
+    "予約は必要ですか？",
+    "個室はありますか？",
+    "テイクアウトはできますか？",
+    "支払い方法は何がありますか？",
+    "営業時間は何時ですか？"
+  ],
+
+  salon: [
+    "予約は必要ですか？",
+    "当日予約は可能ですか？",
+    "指名はできますか？",
+    "料金はいくらですか？",
+    "駐車場はありますか？"
+  ],
+
+  gym: [
+    "初心者でも大丈夫ですか？",
+    "見学はできますか？",
+    "料金はいくらですか？",
+    "営業時間は何時ですか？",
+    "持ち物は何が必要ですか？"
+  ],
+
+  hospital: [
+    "予約は必要ですか？",
+    "初診でも受診できますか？",
+    "診療時間は何時ですか？",
+    "保険は使えますか？",
+    "駐車場はありますか？"
+  ],
+
+  hotel: [
+    "チェックインは何時からですか？",
+    "チェックアウトは何時ですか？",
+    "駐車場はありますか？",
+    "朝食はありますか？",
+    "キャンセルは可能ですか？"
+  ],
+
+  shop: [
+    "営業時間は何時ですか？",
+    "支払い方法は何がありますか？",
+    "返品はできますか？",
+    "配送は可能ですか？",
+    "在庫はありますか？"
+  ],
+
+  company: [
+    "事業内容を教えてください",
+    "採用は行っていますか？",
+    "勤務地はどこですか？",
+    "福利厚生はありますか？",
+    "応募方法を教えてください"
+  ],
+
+  school_elementary: [
+    "給食はありますか？",
+    "ランドセルは必要ですか？",
+    "登校時間は何時ですか？",
+    "学童保育はありますか？",
+    "宿題は多いですか？"
+  ],
+
+  school_junior: [
+    "部活動はありますか？",
+    "制服はありますか？",
+    "定期テストはどのくらいありますか？",
+    "校則は厳しいですか？",
+    "塾に通う必要はありますか？"
+  ],
+
+  school_high: [
+    "在学中にアルバイトはできますか？",
+    "在学中に運転免許を取得できますか？",
+    "進学実績はどのくらいですか？",
+    "制服はありますか？",
+    "部活動はありますか？"
+  ],
+
+  school_university: [
+    "学費はいくらですか？",
+    "アルバイトはできますか？",
+    "留学制度はありますか？",
+    "就職支援はありますか？",
+    "授業はどのような形式ですか？"
+  ],
+
+  employment_support: [
+  "利用するにはどうすればいいですか？",
+  "対象者はどのような人ですか？",
+  "利用料金はかかりますか？",
+  "どのような支援が受けられますか？",
+  "通所頻度はどのくらいですか？",
+  "就職までの流れを教えてください",
+  "見学や体験はできますか？"
+],
+
+nursery: [
+  "入園条件はありますか？",
+  "何歳から預けられますか？",
+  "給食はありますか？",
+  "延長保育はありますか？",
+  "見学はできますか？",
+  "慣らし保育はありますか？",
+  "持ち物は何が必要ですか？"
+],
+
+kindergarten: [
+  "入園試験はありますか？",
+  "教育方針はどのようなものですか？",
+  "給食はありますか？",
+  "送迎バスはありますか？",
+  "預かり保育はありますか？",
+  "制服はありますか？",
+  "見学はできますか？"
+]
+};
+
+// 🔹 カテゴリ判定
+function detectCategory(input) {
+  for (let key in categories) {
+    for (let word of categories[key]) {
+      if (input.includes(word)) {
+        return key;
+      }
+    }
+  }
+  return null;
+}
+
+// 🔹 生成
+function generateFAQ() {
+  const input = document.getElementById("input").value.trim();
+  const output = document.getElementById("output");
+  output.innerHTML = "";
+
+  if (!input) return;
+
+  const category = detectCategory(input);
+
+  let list;
+
+  if (category && faqData[category]) {
+    list = faqData[category];
+  } else {
+    list = [
+      "料金はいくらですか？",
+      "営業時間は何時ですか？",
+      "予約は必要ですか？",
+      "アクセス方法を教えてください",
+      "お問い合わせ方法を教えてください"
+    ];
+  }
+
+  list.forEach(text => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    const p = document.createElement("p");
+    p.textContent = text;
+
+    const btn = document.createElement("button");
+    btn.textContent = "コピー";
+    btn.className = "copy";
+
+    btn.onclick = () => {
+      navigator.clipboard.writeText(text);
+      btn.textContent = "コピー完了！";
+    };
+
+    div.appendChild(p);
+    div.appendChild(btn);
+    output.appendChild(div);
+  });
+}
+</script>
+
+</body>
+</html>
